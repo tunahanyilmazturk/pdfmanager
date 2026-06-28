@@ -42,4 +42,10 @@ const Backend = {
   getErrorLog:          () => api.getErrorLog(),
   getTodayErrorLog:     () => api.getTodayErrorLog(),
   getErrorCodes:        () => api.getErrorCodes(),
+
+  // Ekran Goruntusu
+  captureScreenshot: () => api.captureScreenshot(),
+  listScreenshots:   () => api.listScreenshots(),
+  readScreenshot:    (fp) => api.readScreenshot(fp),
+  deleteScreenshot:  (fp) => api.deleteScreenshot(fp),
 };

@@ -13,7 +13,7 @@ const AppState = {
   mergeItems: [],
   confirmCallback: null,
   dragSourceId: null,
+  viewMode: 'list',          // 'list' | 'grid'
+  contextMenuTarget: null,   // sag tiklanan ogenin id'si
 };
-
-// Global erisim icin window'a ata
 window.AppState = AppState;

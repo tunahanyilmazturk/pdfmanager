@@ -44,4 +44,10 @@ contextBridge.exposeInMainWorld('hantech', {
   getTodayErrorLog: () => ipcRenderer.invoke('get-today-error-log'),
   getErrorCodes: () => ipcRenderer.invoke('get-error-codes'),
   onError: (cb) => { ipcRenderer.on('error-occurred', (_e, d) => cb(d)); },
+
+  // Ekran Goruntusu
+  captureScreenshot: () => ipcRenderer.invoke('capture-screenshot'),
+  listScreenshots: () => ipcRenderer.invoke('list-screenshots'),
+  readScreenshot: (fp) => ipcRenderer.invoke('read-screenshot', fp),
+  deleteScreenshot: (fp) => ipcRenderer.invoke('delete-screenshot', fp),
 });

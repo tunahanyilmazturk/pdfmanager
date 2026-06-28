@@ -29,6 +29,23 @@
             </div>
         </div>
         <div class="header-actions">
+            <button class="btn btn-outline" id="viewModeBtn" title="Grid Gorunum">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                    <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                </svg>
+            </button>
+            <button class="btn btn-outline" id="shortcutsBtn" title="Kisayollar (Ctrl+/)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+            </button>
+            <button class="btn btn-outline" id="screenshotBtn" title="Ekran Goruntusu Al">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                </svg>
+            </button>
             <button class="btn btn-outline btn-error" id="errorLogBtn" title="Hata Kayitlari">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
@@ -197,7 +214,7 @@
                 <span class="search-count" id="searchCount"></span>
             </div>
 
-            <div class="pdf-list-container">
+            <div class="pdf-list-container view-list" id="pdfListContainer">
                 <div class="pdf-list-header">
                     <label class="checkbox-wrapper">
                         <input type="checkbox" id="selectAll">
@@ -527,6 +544,95 @@
         </div>
     </div>
 
+    <!-- CONTEXT MENU (sag tik) -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-header" id="contextMenuFileName">Dosya</div>
+        <div class="context-menu-item" onclick="contextShowInfo()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Bilgiyi Goster
+        </div>
+        <div class="context-menu-item" onclick="contextPrint()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Yazdir
+        </div>
+        <div class="context-menu-item" onclick="contextSelectOnly()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Sadece Bunu Sec
+        </div>
+        <div class="context-menu-item" onclick="contextCopyName()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Adi Kopyala
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item context-menu-danger" onclick="contextRemove()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Listeden Kaldir
+        </div>
+    </div>
+
+    <!-- MODAL: Kisayollar -->
+    <div class="modal-overlay" id="shortcutsModal">
+        <div class="modal" style="width:420px">
+            <div class="modal-header"><h2>Klavye Kisayollari</h2></div>
+            <div class="modal-body">
+                <div class="shortcut-row"><span class="shortcut-key"><kbd>Ctrl</kbd> + <kbd>A</kbd></span><span class="shortcut-desc">Tumunu Sec / Secimi Kaldir</span></div>
+                <div class="shortcut-row"><span class="shortcut-key"><kbd>Ctrl</kbd> + <kbd>P</kbd></span><span class="shortcut-desc">Yazdir</span></div>
+                <div class="shortcut-row"><span class="shortcut-key"><kbd>Delete</kbd></span><span class="shortcut-desc">Secilileri Kaldir</span></div>
+                <div class="shortcut-row"><span class="shortcut-key"><kbd>Escape</kbd></span><span class="shortcut-desc">Modal / Panel Kapat</span></div>
+                <div class="shortcut-row"><span class="shortcut-key"><kbd>Ctrl</kbd> + <kbd>/</kbd></span><span class="shortcut-desc">Bu Paneli Ac</span></div>
+                <div class="shortcut-row"><span class="shortcut-key">Sag Tik</span><span class="shortcut-desc">PDF Islem Menusu</span></div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="shortcutsClose">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Screenshot Preview -->
+    <div class="modal-overlay" id="screenshotPreviewModal">
+        <div class="modal modal-wide" style="width:700px">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h2>Ekran Goruntusu</h2>
+                <button class="btn-icon" id="ssPreviewClose" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="ss-preview-container">
+                    <img id="screenshotPreviewImg" class="ss-preview-img" style="display:none;max-width:100%;max-height:400px;border-radius:var(--radius);border:1px solid var(--border)">
+                </div>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:8px" id="screenshotPath">-</p>
+                <input type="hidden" id="screenshotCurrentPath">
+                <div class="modal-actions">
+                    <button class="btn btn-outline-light" id="ssCopyBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                        Panoya Kopyala
+                    </button>
+                    <button class="btn btn-outline-light" id="ssHistoryBtn">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Gecmis
+                    </button>
+                    <button class="btn btn-primary" id="ssPreviewClose2">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Screenshot History -->
+    <div class="modal-overlay" id="screenshotHistoryModal">
+        <div class="modal modal-wide" style="width:520px">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h2>Screenshot Gecmisi</h2>
+                <button class="btn-icon" id="ssHistoryClose" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="screenshotHistoryBody">
+                <p style="color:var(--text-muted);padding:20px 0;text-align:center">Yukleniyor...</p>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: Onay -->
     <div class="modal-overlay" id="confirmModal">
         <div class="modal">
@@ -635,6 +741,8 @@
     <script src="js/infoPanel.js"></script>
     <script src="js/printActions.js"></script>
     <script src="js/dragDrop.js"></script>
+    <script src="js/contextMenu.js"></script>
+    <script src="js/screenshotActions.js"></script>
     <script src="js/modalManager.js"></script>
     <script src="js/bulkActions.js"></script>
     <script src="js/sessionManager.js"></script>

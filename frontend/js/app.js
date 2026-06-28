@@ -6,6 +6,9 @@ function init() {
   /* ---- Header ---- */
   $('settingsBtn').addEventListener('click', showSettingsModal);
   $('errorLogBtn').addEventListener('click', showErrorLogModal);
+  $('viewModeBtn').addEventListener('click', toggleViewMode);
+  $('shortcutsBtn').addEventListener('click', showShortcutsModal);
+  $('screenshotBtn').addEventListener('click', captureAndShowScreenshot);
 
   /* ---- Sidebar ---- */
   $('pdfYukleBtn').addEventListener('click', selectPdfs);
@@ -122,11 +125,37 @@ function init() {
     if (e.ctrlKey && e.key === 'a') { e.preventDefault(); toggleSelectAll(); }
     if (e.key === 'Delete') removeSelected();
     if (e.ctrlKey && e.key === 'p') { e.preventDefault(); if (AppState.pdfFiles.length > 0) doPrint(); }
+    if (e.ctrlKey && e.key === '/') { e.preventDefault(); showShortcutsModal(); }
     if (e.key === 'Escape') {
       closeInfoPanel();
       document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+      $('contextMenu')?.classList.remove('show');
     }
   });
+
+  /* ---- Sag Tik (context menu) ---- */
+  document.addEventListener('contextmenu', function(e) {
+    const item = e.target.closest('.pdf-item');
+    if (item) {
+      showContextMenu(e, item.dataset.id);
+    }
+  });
+
+  /* ---- Shortcuts ---- */
+  $('shortcutsClose').addEventListener('click', closeShortcutsModal);
+
+  /* ---- Screenshot Modals ---- */
+  $('ssPreviewClose').addEventListener('click', closeScreenshotPreview);
+  $('ssPreviewClose2').addEventListener('click', closeScreenshotPreview);
+  $('ssCopyBtn').addEventListener('click', copyScreenshotToClipboard);
+  $('ssHistoryBtn').addEventListener('click', function() {
+    closeScreenshotPreview();
+    setTimeout(showScreenshotHistory, 200);
+  });
+  $('ssHistoryClose').addEventListener('click', closeScreenshotHistory);
+
+  /* ---- Drag Out (PDF'i disari surukle) ---- */
+  setupDragOut();
 
   /* ---- Print Progress ---- */
   window.hantech.onPrintProgress(function(data) {

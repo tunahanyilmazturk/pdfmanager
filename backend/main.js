@@ -34,6 +34,7 @@ app.whenReady().then(() => {
   require('./ipc/merge.ipc').register(mainWindow);
   require('./ipc/search.ipc').register();
   require('./ipc/fileops.ipc').register();
+  require('./ipc/screenshot.ipc').register(mainWindow);
   require('./ipc/session.ipc').register();
   require('./ipc/category.ipc').register();
 });
