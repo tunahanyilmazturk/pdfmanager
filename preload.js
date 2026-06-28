@@ -4,6 +4,9 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('hantech', {
+  // Sistem
+  getDataPath: () => ipcRenderer.invoke('get-data-path'),
+
   // PDF
   selectPdfs: () => ipcRenderer.invoke('select-pdfs'),
   addPdfFromPath: (fp) => ipcRenderer.invoke('add-pdf-from-path', fp),

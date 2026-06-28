@@ -349,25 +349,79 @@ function hideModal(id) {
   $(id).classList.remove('active');
 }
 
+/* ---------- YARDIMCI ---------- */
+function _updateViewBtn() {
+  const isList = AppState.viewMode === 'list';
+  const svg = isList
+    ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>'
+    : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>';
+  const label = isList ? 'Gorunum' : 'Liste';
+  $('viewModeBtn').innerHTML = svg + '<span class="btn-header-label">' + label + '</span>';
+  $('viewModeBtn').title = isList ? 'Grid Gorunum' : 'Liste Gorunum';
+}
+
 /* ---------- AYARLAR ---------- */
 function showSettingsModal() {
+  // Yukle
   $('rememberSession').checked = localStorage.getItem('rememberSession') !== 'false';
   $('silentPrint').checked = localStorage.getItem('silentPrint') !== 'false';
-  // Tema ve dil ayarlari
+  $('gridDefault').checked = localStorage.getItem('gridDefault') === 'true';
+  $('defaultCopies').value = localStorage.getItem('defaultCopies') || '1';
+  $('defaultPaperSize').value = localStorage.getItem('defaultPaperSize') || 'A4';
   const currentTheme = localStorage.getItem('theme') || 'light';
   $('themeSelect').value = currentTheme;
-  const currentLang = localStorage.getItem('lang') || 'tr';
-  $('langSelect').value = currentLang;
+  $('langSelect').value = localStorage.getItem('lang') || 'tr';
+
+  // Veri yolunu goster
+  Backend.getDataPath().then(p => {
+    $('settingsDataPath').textContent = p;
+  }).catch(() => {
+    $('settingsDataPath').textContent = 'alinamadi';
+  });
+
   $('settingsModal').classList.add('active');
 }
 
-function closeSettingsModal() {
+function saveSettings() {
   localStorage.setItem('rememberSession', $('rememberSession').checked ? 'true' : 'false');
   localStorage.setItem('silentPrint', $('silentPrint').checked ? 'true' : 'false');
+  localStorage.setItem('gridDefault', $('gridDefault').checked ? 'true' : 'false');
+  localStorage.setItem('defaultCopies', $('defaultCopies').value);
+  localStorage.setItem('defaultPaperSize', $('defaultPaperSize').value);
   localStorage.setItem('theme', $('themeSelect').value);
   localStorage.setItem('lang', $('langSelect').value);
   applyTheme($('themeSelect').value);
+
+  // Grid varsayilanini uygula
+  if ($('gridDefault').checked && AppState.viewMode === 'list') {
+    AppState.viewMode = 'grid';
+  } else if (!$('gridDefault').checked && AppState.viewMode === 'grid') {
+    AppState.viewMode = 'list';
+  }
+  _updateViewBtn();
+  renderList();
+
   $('settingsModal').classList.remove('active');
+  setStatus('Ayarlar kaydedildi', 'ok');
+}
+
+function closeSettingsModal() {
+  $('settingsModal').classList.remove('active');
+}
+
+function resetDefaults() {
+  _showConfirm('Ayarlari Sifirla', 'Tum ayarlar varsayilan degerlerine doner. PDF listeniz ve kategorileriniz etkilenmez.', () => {
+    localStorage.removeItem('rememberSession');
+    localStorage.removeItem('silentPrint');
+    localStorage.removeItem('gridDefault');
+    localStorage.removeItem('defaultCopies');
+    localStorage.removeItem('defaultPaperSize');
+    localStorage.removeItem('theme');
+    localStorage.removeItem('lang');
+    applyTheme('light');
+    setStatus('Ayarlar varsayilana dondu', 'ok');
+    showSettingsModal();
+  });
 }
 
 function clearAllData() {

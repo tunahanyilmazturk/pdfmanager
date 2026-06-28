@@ -4,6 +4,9 @@
 const api = window.hantech;
 
 const Backend = {
+  // Sistem
+  getDataPath: () => api.getDataPath(),
+
   // PDF
   selectPdfs:     () => api.selectPdfs(),
   addPdfFromPath: (fp) => api.addPdfFromPath(fp),

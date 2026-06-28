@@ -1,7 +1,7 @@
 // -------------------------------------------------------
 // main.js – Electron ana süreç (entry point)
 // -------------------------------------------------------
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 let mainWindow;
@@ -25,6 +25,9 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
+
+  // Uygulama veri yolunu gonder
+  ipcMain.handle('get-data-path', () => app.getPath('userData'));
 
   // Tüm IPC handler'ları register et
   require('./ipc/error.ipc').register(mainWindow);

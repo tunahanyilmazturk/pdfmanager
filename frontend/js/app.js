@@ -90,7 +90,9 @@ function init() {
 
   /* ---- Settings ---- */
   $('settingsClose').addEventListener('click', closeSettingsModal);
+  $('settingsSaveBtn').addEventListener('click', saveSettings);
   $('clearDataBtn').addEventListener('click', clearAllData);
+  $('resetDefaultsBtn').addEventListener('click', resetDefaults);
 
   /* ---- Confirm ---- */
   $('confirmCancel').addEventListener('click', function() {
