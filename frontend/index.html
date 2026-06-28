@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HanTech PDF Manager</title>
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/error.css">
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10 9 9 9 8 9"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <h1>HanTech PDF Manager</h1>
+                <span class="subtitle">Toplu PDF Yonetim Sistemi</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline btn-error" id="errorLogBtn" title="Hata Kayitlari">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span class="error-dot" id="errorDot"></span>
+            </button>
+            <button class="btn btn-outline" id="settingsBtn" title="Ayarlar">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-section-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span>islemler</span>
+                </div>
+                <div class="sidebar-section-content">
+                    <button class="btn btn-primary btn-full" id="pdfYukleBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        PDF Yukle
+                    </button>
+                    <div class="drop-zone" id="dropZone">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        <p>PDF'leri buraya surukleyin</p>
+                        <span>veya yuklemek icin tiklayin</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+                        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+                    </svg>
+                    <span>Siralama</span>
+                </div>
+                <div class="sidebar-section-content">
+                    <select id="sortSelect" class="sidebar-select">
+                        <option value="custom">Ozel (Surukle)</option>
+                        <option value="name-asc">Isim (A-Z)</option>
+                        <option value="name-desc">Isim (Z-A)</option>
+                        <option value="page-asc">Sayfa (Artan)</option>
+                        <option value="page-desc">Sayfa (Azalan)</option>
+                        <option value="date-asc">Tarih (Eski-Yeni)</option>
+                        <option value="date-desc" selected>Tarih (Yeni-Eski)</option>
+                        <option value="size-asc">Boyut (Kucuk-Buyuk)</option>
+                        <option value="size-desc">Boyut (Buyuk-Kucuk)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+                    </svg>
+                    <span>Kategoriler</span>
+                </div>
+                <div class="sidebar-section-content">
+                    <div class="category-list" id="categoryList"></div>
+                    <button class="btn btn-sm btn-outline btn-full" id="addCategoryBtn" style="margin-top:4px">+ Kategori Ekle</button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-section-header">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 6 2 18 2 18 9"/>
+                        <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                        <rect x="6" y="14" width="12" height="8"/>
+                    </svg>
+                    <span>Toplu Islem</span>
+                </div>
+                <div class="sidebar-section-content">
+                    <button class="btn btn-success btn-full" id="printBtn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6 9 6 2 18 2 18 9"/>
+                            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                            <rect x="6" y="14" width="12" height="8"/>
+                        </svg>
+                        <span id="printBtnText">Tumunu Yazdir</span>
+                    </button>
+                    <button class="btn btn-warning btn-full" id="mergeBtn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 3v12m0 0l-3-3m3 3l3-3M5 21h14"/>
+                        </svg>
+                        PDF Birlestir
+                    </button>
+                    <button class="btn btn-full" id="pdfActionsBtn" disabled style="background:#475569;color:#fff">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/>
+                        </svg>
+                        PDF Islemleri
+                    </button>
+                    <button class="btn btn-danger btn-full" id="removeBtn" disabled>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+                            <path d="M10 11v6"/><path d="M14 11v6"/>
+                        </svg>
+                        Secilileri Kaldir
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <p>HanTech &copy; 2025</p>
+                <p class="version">Surum 2.1.0</p>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-content" id="mainContent">
+            <div class="info-bar">
+                <div class="info-item">
+                    <span class="info-label">Toplam PDF</span>
+                    <span class="info-value" id="totalCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Seçili</span>
+                    <span class="info-value" id="selectedCount">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Toplam Boyut</span>
+                    <span class="info-value" id="totalSize">0 MB</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Toplam Sayfa</span>
+                    <span class="info-value" id="totalPages">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Durum</span>
+                    <span class="info-value status-ok" id="statusText">Hazır</span>
+                </div>
+                <div class="info-item printer-info">
+                    <span class="info-label">Yazıcı</span>
+                    <span class="info-value" id="printerName">Kontrol ediliyor...</span>
+                </div>
+            </div>
+
+            <div class="search-bar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="searchInput" placeholder="PDF ara...">
+                <span class="search-count" id="searchCount"></span>
+            </div>
+
+            <div class="pdf-list-container">
+                <div class="pdf-list-header">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="selectAll">
+                        <span class="checkmark"></span>
+                    </label>
+                    <span class="col-order">#</span>
+                    <span class="col-name">Dosya Adı</span>
+                    <span class="col-pages">Sayfa</span>
+                    <span class="col-size">Boyut</span>
+                    <span class="col-date">Tarih</span>
+                    <span class="col-category">Kategori</span>
+                    <span class="col-actions">İşlem</span>
+                </div>
+                <div class="pdf-list" id="pdfList">
+                    <div class="empty-state">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                        <h3>Henüz PDF yüklenmedi</h3>
+                        <p>PDF eklemek için "PDF Yükle" butonuna tıklayın veya dosyaları sürükleyin.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- INFO PANEL (sağ) -->
+        <aside class="info-panel" id="infoPanel">
+            <div class="info-panel-header">
+                <h3>PDF Bilgisi</h3>
+                <button class="btn-icon" id="closeInfoPanel" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="info-panel-content" id="infoPanelContent">
+                <div class="info-panel-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <p>Bir PDF seçin<br>bilgilerini görüntüleyin</p>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- MODAL: Yazdırma Ayarları -->
+    <div class="modal-overlay" id="printSettingsModal">
+        <div class="modal modal-wide">
+            <div class="modal-header"><h2>Yazdırma Ayarları</h2></div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Yazıcı</label>
+                        <select id="printPrinter" class="form-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kopya Sayısı</label>
+                        <input type="number" id="printCopies" class="form-input" value="1" min="1" max="99">
+                    </div>
+                    <div class="form-group">
+                        <label>Renk Modu</label>
+                        <select id="printColorMode" class="form-select">
+                            <option value="color">Renkli</option><option value="bw">Siyah-Beyaz</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kağıt Boyutu</label>
+                        <select id="printPaperSize" class="form-select">
+                            <option value="A4">A4</option><option value="A3">A3</option><option value="Letter">Letter</option><option value="Legal">Legal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Yönlendirme</label>
+                        <select id="printOrientation" class="form-select">
+                            <option value="portrait">Dikey</option><option value="landscape">Yatay</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Çift Taraflı</label>
+                        <select id="printDuplex" class="form-select">
+                            <option value="false">Tek Taraflı</option><option value="true">Çift Taraflı</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-info" id="printModalInfo"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="printSettingsCancel">İptal</button>
+                    <button class="btn btn-success" id="printSettingsStart">Yazdırmayı Başlat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Yazdırma İlerleme -->
+    <div class="modal-overlay" id="printModal">
+        <div class="modal">
+            <div class="modal-header"><h2>Yazdırılıyor...</h2></div>
+            <div class="modal-body">
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span id="progressFileName">Hazırlanıyor...</span>
+                        <span id="progressCount">0 / 0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="modal-status" id="modalStatus">Lütfen bekleyin...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Kategori Ekle -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal">
+            <div class="modal-header"><h2>Kategori Ekle</h2></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Kategori Adı</label>
+                    <input type="text" id="categoryNameInput" class="form-input" placeholder="Kategori adı girin...">
+                </div>
+                <div class="form-group">
+                    <label>Renk</label>
+                    <div class="color-picker" id="colorPicker">
+                        <div class="color-option selected" data-color="#2563eb" style="background:#2563eb"></div>
+                        <div class="color-option" data-color="#16a34a" style="background:#16a34a"></div>
+                        <div class="color-option" data-color="#dc2626" style="background:#dc2626"></div>
+                        <div class="color-option" data-color="#f59e0b" style="background:#f59e0b"></div>
+                        <div class="color-option" data-color="#8b5cf6" style="background:#8b5cf6"></div>
+                        <div class="color-option" data-color="#ec4899" style="background:#ec4899"></div>
+                        <div class="color-option" data-color="#06b6d4" style="background:#06b6d4"></div>
+                        <div class="color-option" data-color="#f97316" style="background:#f97316"></div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="categoryCancel">İptal</button>
+                    <button class="btn btn-primary" id="categorySave">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PDF Birleştir -->
+    <div class="modal-overlay" id="mergeModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h2>PDF Birleştir</h2>
+                <p class="modal-subtitle">Sıralamayı değiştirmek için sürükleyin</p>
+            </div>
+            <div class="modal-body">
+                <div class="merge-list" id="mergeList"></div>
+                <div class="form-group" style="margin-top:12px">
+                    <label>Kaydet</label>
+                    <div style="display:flex;gap:8px">
+                        <input type="text" id="mergeFileName" class="form-input" value="birlestirilmis.pdf" style="flex:1">
+                        <button class="btn btn-primary" id="mergeSaveBtn">Birleştir ve Kaydet</button>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="mergeCancel">İptal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Ayarlar -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header"><h2>Ayarlar</h2></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Oturumu Hatirla</label>
+                    <label class="toggle-wrapper">
+                        <input type="checkbox" id="rememberSession" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Uygulama kapanirken PDF listesini kaydet</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Hizli Yazdirma</label>
+                    <label class="toggle-wrapper">
+                        <input type="checkbox" id="silentPrint" checked>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Dogrudan yazdir (ayarlari atla)</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Tema</label>
+                    <select id="themeSelect" class="form-select">
+                        <option value="light">Acik Tema</option>
+                        <option value="dark">Koyu Tema</option>
+                    </select>
+                </div>
+                <hr class="form-divider">
+                <button class="btn btn-danger" id="clearDataBtn">Tum Verileri Temizle</button>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="settingsClose">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PDF Islemleri Menusu -->
+    <div class="modal-overlay" id="pdfActionsMenu">
+        <div class="modal" style="width:380px">
+            <div class="modal-header"><h2>PDF Islemleri</h2></div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:8px">
+                <button class="btn btn-full btn-outline-light" id="renameActionBtn" style="justify-content:flex-start">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Toplu Yeniden Adlandir
+                </button>
+                <button class="btn btn-full btn-outline-light" id="searchActionBtn" style="justify-content:flex-start">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    PDF Icinde Ara
+                </button>
+                <button class="btn btn-full btn-outline-light" id="splitActionBtn" style="justify-content:flex-start">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    Sayfa Ayir / Cikar
+                </button>
+                <button class="btn btn-full btn-outline-light" id="deletePagesActionBtn" style="justify-content:flex-start">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+                    Sayfa Sil
+                </button>
+                <div class="modal-actions" style="margin-top:4px;border:none;padding:0">
+                    <button class="btn btn-outline-light btn-full" id="pdfActionsClose">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Toplu Yeniden Adlandir -->
+    <div class="modal-overlay" id="renameModal">
+        <div class="modal modal-wide">
+            <div class="modal-header"><h2>Toplu Yeniden Adlandir</h2></div>
+            <div class="modal-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>On Ek (Prefix)</label>
+                        <input type="text" id="renamePrefix" class="form-input" placeholder="ornek: fatura_">
+                    </div>
+                    <div class="form-group">
+                        <label>Baslangic Numarasi</label>
+                        <input type="number" id="renameStart" class="form-input" value="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Basamak Sayisi</label>
+                        <input type="number" id="renamePadding" class="form-input" value="2" min="1" max="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Mod</label>
+                        <select id="renameMode" class="form-select">
+                            <option value="simple">Basit (Prefix+Sayi)</option>
+                            <option value="date">Tarih+Prefix+Sayi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Onizleme</label>
+                    <div id="renamePreview" class="rename-preview" style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline-light" id="renameCancel">Iptal</button>
+                    <button class="btn btn-primary" id="renameApplyBtn">Uygula</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PDF Icinde Ara -->
+    <div class="modal-overlay" id="searchModal">
+        <div class="modal modal-wide">
+            <div class="modal-header"><h2>PDF Icinde Ara</h2></div>
+            <div class="modal-body">
+                <div style="display:flex;gap:8px">
+                    <input type="text" id="searchQuery" class="form-input" placeholder="Aranacak kelime..." style="flex:1">
+                    <button class="btn btn-primary" id="searchExecuteBtn">Ara</button>
+                </div>
+                <div style="margin-top:8px;font-size:11px;color:var(--text-muted)">Secili PDF'lerde arar (<span id="searchResultsCount">0</span>)</div>
+                <div id="searchResultsBody" class="search-results" style="margin-top:8px;max-height:300px;overflow-y:auto"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline-light" id="searchCloseBtn">Kapat</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Sayfa Ayir -->
+    <div class="modal-overlay" id="splitModal">
+        <div class="modal">
+            <div class="modal-header"><h2>Sayfa Ayir / Cikar</h2></div>
+            <div class="modal-body">
+                <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px" id="splitFileName">-</p>
+                <div class="form-group">
+                    <label>Sayfa Araligi</label>
+                    <input type="text" id="splitPageRange" class="form-input" placeholder="ornek: 1-3,5-7">
+                    <input type="hidden" id="splitFileId" value="">
+                    <p style="font-size:10px;color:var(--text-muted);margin-top:4px">Birden fazla aralik icin virgul kullanin. Ornek: 1-3,5-7</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline-light" id="splitCancel">Iptal</button>
+                    <button class="btn btn-primary" id="splitSaveBtn">Ayir ve Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Sayfa Sil -->
+    <div class="modal-overlay" id="deletePagesModal">
+        <div class="modal">
+            <div class="modal-header"><h2>Sayfa Sil</h2></div>
+            <div class="modal-body">
+                <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px" id="delPagesFileName">-</p>
+                <div class="form-group">
+                    <label>Silinecek Sayfalar</label>
+                    <input type="text" id="delPagesInput" class="form-input" placeholder="ornek: 1,3,5">
+                    <input type="hidden" id="delPagesFileId" value="">
+                    <p style="font-size:10px;color:var(--text-muted);margin-top:4px">Virgulle ayirarak sayfa numaralarini girin</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline-light" id="delPagesCancel">Iptal</button>
+                    <button class="btn btn-danger" id="delPagesSaveBtn">Sil ve Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Onay -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <div class="modal-header"><h2 id="confirmTitle">Onay</h2></div>
+            <div class="modal-body">
+                <p id="confirmMessage" style="margin-bottom:16px;color:var(--text-secondary)"></p>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="confirmCancel">İptal</button>
+                    <button class="btn btn-danger" id="confirmOk">Evet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Hata Bildirimi -->
+    <div class="modal-overlay" id="errorModal">
+        <div class="modal modal-wide">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h2>Hata</h2>
+                <button class="btn-icon" id="errorModalClose" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="error-container">
+                    <div class="error-header" id="errorHeader">
+                        <div class="error-icon" id="errorIcon"></div>
+                        <div style="flex:1">
+                            <span class="error-badge" id="errorBadge">HATA</span>
+                            <span class="error-code" id="errorCode">Kod: 0</span>
+                            <div class="error-title" id="errorTitle">Bilinmeyen Hata</div>
+                            <div class="error-detail" id="errorDetail">-</div>
+                        </div>
+                    </div>
+                    <div class="error-body">
+                        <div class="error-section">
+                            <div class="error-section-label">Zaman</div>
+                            <div class="error-section-value" id="errorTime">-</div>
+                        </div>
+                        <div class="error-section">
+                            <div class="error-section-label">Hata ID</div>
+                            <div class="error-section-value" id="errorId" style="font-size:10px">-</div>
+                        </div>
+                        <div class="error-section">
+                            <div class="error-section-label">Orijinal Hata Mesaji</div>
+                            <div class="error-section-value" id="errorOriginal">-</div>
+                        </div>
+                        <div class="error-section">
+                            <div class="error-section-label">Baglam</div>
+                            <div class="error-section-value" id="errorContext">-</div>
+                        </div>
+                        <div class="error-section">
+                            <div class="error-section-label">Stack Trace</div>
+                            <div class="error-section-value" id="errorStack" style="font-family:monospace;font-size:10px;max-height:150px;overflow-y:auto;white-space:pre-wrap">(stack yok)</div>
+                        </div>
+                    </div>
+                    <div class="error-actions">
+                        <button class="btn btn-primary" id="errorCopyBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                            Hatayi Kopyala
+                        </button>
+                        <button class="btn btn-outline" id="errorLogViewBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Tum Loglar
+                        </button>
+                        <button class="btn btn-outline" id="errorCloseBtn">Kapat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Hata Log -->
+    <div class="modal-overlay" id="errorLogModal">
+        <div class="modal modal-wide">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center">
+                <h2>Hata Kayitlari</h2>
+                <button class="btn-icon" id="errorLogModalClose" title="Kapat">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="errorLogBody">
+                <p style="color:var(--text-muted);font-size:13px">Yukleniyor...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy Toast -->
+    <div class="copy-toast" id="copyToast">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;vertical-align:middle"><polyline points="20 6 9 17 4 12"/></svg>
+        Hata panoya kopyalandi!
+    </div>
+
+    <!-- JS Modülleri (sıralama önemli!) -->
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/sendMessage.js"></script>
+    <script src="js/errorHandler.js"></script>
+    <script src="js/pdfActions.js"></script>
+    <script src="js/uiRenderer.js"></script>
+    <script src="js/listRenderer.js"></script>
+    <script src="js/infoPanel.js"></script>
+    <script src="js/printActions.js"></script>
+    <script src="js/dragDrop.js"></script>
+    <script src="js/modalManager.js"></script>
+    <script src="js/bulkActions.js"></script>
+    <script src="js/sessionManager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

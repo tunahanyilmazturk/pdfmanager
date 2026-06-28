@@ -1,0 +1,21 @@
+{
+  "name": "hantech-pdf-manager",
+  "version": "2.1.0",
+  "description": "HanTech PDF Manager - Toplu PDF yönetimi ve çıktı alma uygulaması",
+  "main": "backend/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --no-sandbox"
+  },
+  "author": "HanTech",
+  "license": "MIT",
+  "dependencies": {
+    "pdf-lib": "^1.17.1",
+    "pdf-to-printer": "^5.8.0",
+    "pdfjs-dist": "^3.11.174"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-packager": "^17.1.2"
+  }
+}
