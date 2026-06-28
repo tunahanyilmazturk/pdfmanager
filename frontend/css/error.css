@@ -124,6 +124,7 @@
 
 /* ---------- ERROR BUTTON ---------- */
 .btn-error { position: relative; }
+.btn-header-error { position: relative; }
 .error-dot {
   position: absolute;
   top: -1px;
